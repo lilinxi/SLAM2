@@ -163,6 +163,26 @@ SLAM 是指当某种移动设备（如机器人、无人机、手机等）从一
 
 切向畸变是由于透镜和 CMOS 或者 CCD 的安装位置误差导致。如果存在切向畸变，一个矩形被投影到成像平面上时，很可能会变成一个梯形。不过随着相机制造工艺的大大提升，这种情况很少出现了，所以一般也不考虑切向的畸变。
 
+# [对极约束](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486151&idx=1&sn=2b322f466d916704b1070ece20e669db&chksm=97d7ef50a0a06646a984fcbf82870011ec10a9233899ee74fe8c09432517c5efaa285f1897c9&scene=21#wechat_redirect)
+
+## 对极几何基本概念
+
+![](./img/epipolar.png)
+
+C0-C1-P 组成的平面称为极平面（epipolar plane），和成像平面相交的直线称之为极线（epipolar line），两个光心 C0, C1 和成像平面的交点叫做极点（epipole）。
+
+## 理解对极约束
+
+![](./img/epipolar-1.png)
+
+![](./img/epipolar-2.png)
+
+## 极线方程
+
+![](./img/epipolar-3.png)
+
+![](./img/epipolar-4.png)
+
 ---
 
 # References
