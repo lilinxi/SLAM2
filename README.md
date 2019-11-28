@@ -11,7 +11,7 @@ SLAM 是 Simultaneous Localization And Mapping 的英文首字母组合，一般
 
 ## [学习 SLAM 到底需要学什么](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247485820&idx=1&sn=3fdb40aec678c2ed03e2ecb8ce9bf812&chksm=97d7eceba0a065fdcd70cae70e2910f72850f6ab6303c9b66ec8addaeb1fe633345990544541&scene=21#wechat_redirect)
 
-![](./img/SLAM tree.jpg)
+![](./img/SLAM-tree.jpg)
 
 - 相机相关：单目、双目、RGB-D 等相机的物理参数意义、相机成像模型、相机的标定、去畸变等。双目的话还涉及到视差计算，RGB-D 的话涉及到 RGB 和 depth 图像的对齐等。
 - 图像处理相关：特征点描述子、特征点提取、特征点匹配、图像梯度计算、边缘检测、直线检测等。
