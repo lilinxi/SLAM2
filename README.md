@@ -1,6 +1,8 @@
 SLAM 是 Simultaneous Localization And Mapping 的英文首字母组合，一般翻译为：同时定位与建图、同时定位与地图构建。SLAM 是三维视觉的核心技术，广泛应用于 AR
 、自动驾驶、智能机器人、无人机等前沿热门领域。可以说凡是具有一定行动能力的智能体都拥有某种形式的 SLAM 系统。
 
+@[TOC]
+
 # 从零开始学习 SLAM
 
 ## [为什么要学 SLAM](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247485792&idx=1&sn=358b9bea94cf31b976abc3c12b28f4d7&chksm=97d7ecf7a0a065e1664469c22adce35e6d919d74f5ab95693c8921241f3fefe37fb571527e10&scene=21#wechat_redirect)
@@ -246,9 +248,33 @@ pcl::RadiusOutlierRemoval< pcl::PointXYZ >
 
 根据空间点半径范围临近点数量来滤波。在点云数据中，设定每个点一定半径范围内周围至少有足够多的近邻，不满足就会被删除。
 
+## [点云平滑法线估计](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486705&idx=1&sn=ca333d7bb12b7c226270e98d0003a789&chksm=97d7e966a0a06070a8dba605966016d227d7a6cad786498070d9e1b8cea8747470a4840257fd&scene=21#wechat_redirect)
 
+### 点云滤波后还需要平滑
 
+用 RGB-D，激光扫描仪等设备扫描物体，尤其是比较小的物体时，往往会有测量误差。这些误差所造成的不规则数据如果直接拿来曲面重建的话，会使得重建的曲面不光滑或者有漏洞，而且这种不规则数据很难用前面提到过的统计分析等滤波方法消除，所以为了建立光滑完整的模型必须对物体表面进行平滑处理和漏洞修复。
 
+### 通过重采样实现点云平滑
+
+点云重采样，实际上是通过“移动最小二乘”（MLS， Moving Least Squares ）法来实现的。
+
+```c
+pcl::MovingLeastSquares< PointT, PointT >
+```
+
+### 估计点云的表面法线
+
+法线的用处：尤其是在三维建模中应用非常广泛，比如在计算机图形学（computer graphics）领域里，法线决定着曲面与光源（light source）的强弱处理（Flat Shading），对于每个点光源位置，其亮度取决于曲面法线的方向。
+
+点云的法线计算一般有两种方法：
+
+1. 使用曲面重建方法，从点云数据中得到采样点对应的曲面，然后再用曲面模型计算其表面的法线；
+2. 直接使用近似值直接从点云数据集推断出曲面法线。
+
+```c
+// 直接使用近似值直接从点云数据集推断出曲面法线
+pcl::NormalEstimation< PointT, pcl::Normal > 
+```
 
 
 ---
