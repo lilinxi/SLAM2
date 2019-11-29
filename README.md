@@ -1,6 +1,7 @@
 SLAM 是 Simultaneous Localization And Mapping 的英文首字母组合，一般翻译为：同时定位与建图、同时定位与地图构建。SLAM 是三维视觉的核心技术，广泛应用于 AR
 、自动驾驶、智能机器人、无人机等前沿热门领域。可以说凡是具有一定行动能力的智能体都拥有某种形式的 SLAM 系统。
 
+
 Table of Contents
 =================
 
@@ -39,6 +40,23 @@ Table of Contents
             * [点云滤波后还需要平滑](#点云滤波后还需要平滑)
             * [通过重采样实现点云平滑](#通过重采样实现点云平滑)
             * [估计点云的表面法线](#估计点云的表面法线)
+         * [点云到网格](#点云到网格)
+            * [什么是网格](#什么是网格)
+            * [网格生成算法](#网格生成算法)
+            * [点云贪心三角化原理](#点云贪心三角化原理)
+            * [Delaunay 三角剖分简介](#delaunay-三角剖分简介)
+      * [理解图优化](#理解图优化)
+         * [图优化的优势](#图优化的优势)
+         * [图优化是什么](#图优化是什么)
+         * [g2o 框架(General Graphic Optimization)](#g2o-框架general-graphic-optimization)
+      * [ICP 原理及应用](#icp-原理及应用)
+      * [四元数插值](#四元数插值)
+      * [SLAM 技术框架](#slam-技术框架)
+         * [SLAM 技术框架](#slam-技术框架-1)
+         * [视觉里程计：起源、优势、对比、应用](#视觉里程计起源优势对比应用)
+         * [视觉里程计：特征点法之全面梳理](#视觉里程计特征点法之全面梳理)
+            * [如何获得好的 VO 效果](#如何获得好的-vo-效果)
+            * [特征点法 VO 算法](#特征点法-vo-算法)
    * [References](#references)
       * [计算机视觉汇总分类](#计算机视觉汇总分类)
       * [从零开始，系统化学习三维视觉核心技术路线](#从零开始系统化学习三维视觉核心技术路线)
@@ -383,7 +401,110 @@ Delaunay 条件：所有三角形的顶点都不在其他三角形的外接圆�
 
 Delaunay 三角剖分：它通过选取一个样本三角片作为初始曲面，不断扩张延伸曲面的边界，直到所有符合几何正确性和拓扑正确性的点都被连上，最后形成一张完整的三角网格曲面。
 
+## [理解图优化](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486858&idx=1&sn=ce458d5eb6b1ad11b065d71899e31a04&chksm=97d7e81da0a0610b1e3e12415b6de1501329920c3074ab5b48e759edbb33d264a73f1a9f9faf&scene=21#wechat_redirect)
 
+### 图优化的优势
+
+SLAM 的后端一般分为两种处理方法，一种是以扩展卡尔曼滤波（EKF）为代表的滤波方法，一种是以图优化为代表的非线性优化方法。目前 SLAM 研究的主流热点几乎都是基于图优化的。
+
+代表性的就是2009年，《SBA：A software package for generic sparse bundle adjustment》，基于图优化的视觉 SLAM 可以实时了。
+
+### 图优化是什么
+
+图优化里的图就是数据结构里的图，一个图由若干个顶点（vertex），以及连接这些顶点的边（edge）组成。
+
+在 SLAM 里，图优化一般分解为两个任务：
+
+1. 构建图。相机位姿作为顶点，位姿间关系作为边。
+2. 优化图。调整相机的位姿（顶点）来尽量满足边的约束，使得误差最小。
+
+### [g2o 框架(General Graphic Optimization)](https://github.com/RainerKuemmerle/g2o)
+
+![](./img/g2o.png)
+
+- [g2o 顶点](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486992&idx=1&sn=ecb7c3ef9bd968e51914c2f5b767428d&chksm=97d7eb87a0a062912a9db9fb16a08129f373791fd3918952342d5db46c0bc4880326a7933671&scene=21#wechat_redirect)
+- [g2o 边](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247487082&idx=1&sn=d4a27e4c9a76760fffb571f57f4f7719&chksm=97d7ebfda0a062eba412877e9ecf5933f2051f0210c0d56f03267985512d97f2db434ab7356c&scene=21#wechat_redirect)
+
+## [ICP 原理及应用](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247487562&idx=1&sn=f1c5030d8bb7e58891d49ee7d245ab7e&chksm=97d7f5dda0a07ccba22349823cf63fdfee955794fa19cd89bcef159210a5192ad8d96ea412a2&scene=21#wechat_redirect)
+
+ICP 全称 Iterative Closest Point，就是迭代最近点。ICP在点云配准领域应用的非常广泛，因此基于深度相机、激光雷达的算法使用ICP的频率比较高。
+
+ICP 算法流程：
+
+1. 首先对于一幅点云中的每个点，在另一幅点云中计算匹配点（最近点）。
+2. 极小化匹配点间的匹配误差，计算位姿。
+3. 然后将计算的位姿作用于点云。
+4. 再重新计算匹配点。
+5. 如此迭代，直到迭代次数达到阈值，或者极小化的能量函数变化量小于设定阈值。
+
+## [四元数插值](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247488219&idx=1&sn=bbcdb7e680763aa21b5c31dd055842b6&chksm=97d7f74ca0a07e5a1cb96a2b81edf27ac777c33bb368aa7ca2da17bf0da3167056bbd92f4fbf&scene=21#wechat_redirect)
+
+- 线性插值
+- 球面线性插值
+
+## [SLAM 技术框架](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247484338&idx=1&sn=ba5db3dbe46728706b006a9554a6862a&chksm=97d7e625a0a06f3380c5c75c8501a2ba589d6288086268f0424e3d2091c72daaf0abbb0004f5&scene=21#wechat_redirect)
+
+### SLAM 技术框架
+
+![](./img/slam.jpg)
+
+- 预处理
+    - 传感器数据预处理。
+- 前端
+    - 又称为视觉里程计（visual odometry，简称VO）。
+    - 主要是研究如何根据相邻帧图像定量估算帧间相机的运动。
+    - 只计算相邻帧的运动，进行局部估计，这会不可避免的出现累积漂移，这是因为每次估计两个图像间的运动时都有一定的误差，经过相邻帧多次传递，前面的误差会逐渐累积，轨迹漂移（drift）的越来越厉害。
+    - 解决轨迹漂移的方法有两个：后端优化、回环检测。
+- 后端
+    - 对前端的结果进行优化，得到最优的位姿估计。
+    - 主要有两种方法：基于滤波理论的优化（EKF（扩展[卡尔曼滤波](https://zhuanlan.zhihu.com/p/39912633)））；非线性优化（图优化）。
+- 回环检测
+    - 主要目的是让相机能够认识自己曾经去过的地方，从而解决位置随时间漂移的问题。
+    - 当回环检测成功后，就会建立现在的图像和过去曾经见过图像的对应关系，后端优化算法可以根据这些信息来重新调整轨迹和地图，从而最大限度地消除累积误差。
+- 建立地图
+
+### [视觉里程计：起源、优势、对比、应用](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247484393&idx=1&sn=8b2ddf91d57cd53fe15a804d457f96cc&chksm=97d7e67ea0a06f68ede23bf24606333b56a0b2f07a674eb0b8d5009ccae64524d9fcbc79e9f0&scene=21#wechat_redirect)
+
+**VO vs. Structure from Motion（SfM）**：
+
+> 视觉里程计概念来自车轮里程计。视觉里程计是通过移动物体（如车辆、人、机器人）上搭载的单个或多个相机拍摄的连续图像作为输入，从而增量式地估计物体自身的运动状态。
+>
+> SfM
+> 中文译为运动恢复结构。是指从一组相机图像（有序或者无序都可以）中恢复相机位置姿态和重建三维结构的一种通用方法。最终结构和相机位姿通过离线优化算法来进一步提升效果，它的计算时间随图像的数量增加而增长。SfM
+> 的一个比较著名的项目就是[《Building Rome in a Day》](http://grail.cs.washington.edu/projects/rome/index.html
+>)：该项目利用网上搜集到的以罗马为关键词的200万张图片，经过一天的计算时间实现了对罗马的三维重建。
+
+### [视觉里程计：特征点法之全面梳理](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247484413&idx=1&sn=5d62ae75e7303647dffd7342027778ba&chksm=97d7e66aa0a06f7cd71b63ca5668b6f3c093a9c83c21d47160cc3971ca2846d661c20b1746db&scene=21#wechat_redirect)
+
+根据 VO 是否需要提取特征点，VO 的具体实现方法可以分为基于特征点法的 VO 和直接法 VO。特征点法 VO 是以提取图像中的特征点为基础，学术界有长久的研究，运行比较稳定、对光照变化和动态场景鲁棒性强，是比较成熟的 VO
+ 实现方案。而直接法 VO 是为了克服特征点法 VO 的部分缺点（如计算量大，不适用于纹理缺乏场景等）而出现的。
+
+#### 如何获得好的 VO 效果
+
+1. 环境的光照强度比较合适，不能太暗或者太亮。
+2. 环境具有相对丰富的纹理。
+3. 需要捕捉连续的图像，保证相邻图像帧的内容有足够的重叠区域。
+4. 最好是静态场景下运行。
+
+#### 特征点法 VO 算法
+
+1. 特征点检测
+    - 特征点的选择和设计非常重要。优秀的特征点应该具有以下特征：
+        1. 高辨识度。能够和周围的像素进行明显的区分，具有极强的代表性。
+        2. 可重复性强。相同的特征点可以在下一幅图像中被再次检测到，这样才能进行特征点匹配。
+        3. 高鲁棒性。在光照变化、几何变化（旋转、缩放，透视变形）时能够保持没有明显变化，在图像中存在噪声，压缩损伤，模糊等情况下仍然能够检测到。
+        4. 计算效率高。
+    - 常用特征点：SIFT，FAST，ORB 
+2. 特征匹配
+    - 暴力匹配，握手匹配，快速近似最近邻匹配（FLANN）
+3. 运动估计
+    1. 2D-2D：对极约束(极线约束)
+    2. 3D-3D：迭代最近点（iterative closest point, ICP）
+    3. 3D-2D：PnP(perspective-n-point)
+4. 离群点移除
+    - 最常用的离群点去除方法就是随机采样一致算法（Random Sample Consensus，RANSAC）
+5. Bundle Adjustment 优化
+    - BA 的本质是一个优化模型，其目的是最小化重投影误差。
 
 ---
 
