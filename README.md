@@ -183,6 +183,74 @@ C0-C1-P 组成的平面称为极平面（epipolar plane），和成像平面相�
 
 ![](./img/epipolar-4.png)
 
+# [单应矩阵](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486191&idx=1&sn=3b33d748dd4cd035e429665ef1e40299&chksm=97d7ef78a0a0666ebdd86886241b19c0a77a0ec8fa5e1a1ff5de2ae3e89740ffc5516f942bab&scene=21#wechat_redirect)
+
+![](./img/homography-0.jpg)
+
+![](./img/homography-1.jpg)
+
+![](./img/homography-2.jpg)
+
+![](./img/homography-3.jpg)
+
+![](./img/homography-4.jpg)
+
+# [点云](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486281&idx=1&sn=1b36bcfd9f492dabc44ae2f10562e040&chksm=97d7eedea0a067c89eb9b1e71f7cf5dd12410c8c81d43dc2a21f9c6f28babd7add017ad14705&scene=21#wechat_redirect)
+
+## 点云的优缺点
+
+第一个优点就是可以表达物体的空间轮廓和具体位置。第二个优点就是，点云本身和视角无关，也就是你可以任意旋转，可以从不同角度和方向观察一个点云，而且不同的点云只要在同一个坐标系下就可以直接融合。
+
+第一个缺点就是点云并不是稠密的表达，一般比较稀疏，在空间很多位置其实没有点云，这部分的信息是缺失的。第二个缺点就是点云的分辨率和离相机的距离有关。离近了看是看不清是什么的，只能拉的很远才能看个大概。
+
+## [PCL](http://docs.pointclouds.org/trunk/index.html)
+
+![](./img/point-cloud.jpg)
+
+## [点云滤波](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486610&idx=1&sn=145132b3de5600d3a288c00bd50a7fa7&chksm=97d7e905a0a0601389157ca27a1be2618243f822583c5660ea18ff51f88f317fe8ac84360856&scene=21#wechat_redirect)
+
+滤波原因：
+
+1. 点云数据密度不规则需要平滑
+2. 因为遮挡等问题造成离群点需要去除
+3. 大量数据需要下采样
+4. 噪声数据需要去除
+
+滤波方案：
+
+1. 按照给定的规则限制过滤去除点
+2. 通过常用滤波算法修改点的部分属性
+3. 对数据进行下采样
+
+### 点云下采样
+
+```c
+pcl::ApproximateVoxelGrid< PointT >
+```
+
+对输入的点云数据创建一个三维体素栅格，每个体素内用体素中所有点的重心来近似显示体素中其他点，这样该体素内所有点都用一个重心点最终表示。它的优点是可以在下采样的时候保存点云的形状特征。
+
+### 去除点云的离群点
+
+离群点会使局部点云特征(如表面法线或曲率变化)的估计复杂化，从而导致错误的值，从而可能导致点云配准失败。而且这些离群点还会随着积累进行传导。
+
+```c
+pcl::StatisticalOutlierRemoval< pcl::PointXYZ >
+```
+
+对每个点的邻域进行统计分析，剔除不符合一定标准的邻域点。具体来说，对于每个点，我们计算它到所有相邻点的平均距离。假设得到的分布是高斯分布，可以计算出一个均值 μ 和一个标准差 σ，那么这个邻域点集中所有点与其邻域距离大于 μ + std_mul * σ 区间之外的点都可以被视为离群点，并可从点云数据中去除。std_mul 是标准差倍数的一个阈值。
+
+```c
+pcl::RadiusOutlierRemoval< pcl::PointXYZ > 
+```
+
+根据空间点半径范围临近点数量来滤波。在点云数据中，设定每个点一定半径范围内周围至少有足够多的近邻，不满足就会被删除。
+
+
+
+
+
+
 ---
 
 # References
