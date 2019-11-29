@@ -1,7 +1,50 @@
 SLAM 是 Simultaneous Localization And Mapping 的英文首字母组合，一般翻译为：同时定位与建图、同时定位与地图构建。SLAM 是三维视觉的核心技术，广泛应用于 AR
 、自动驾驶、智能机器人、无人机等前沿热门领域。可以说凡是具有一定行动能力的智能体都拥有某种形式的 SLAM 系统。
 
- * [从零开始学习 SLAM](#从零开始学习-slam)
+Table of Contents
+=================
+
+   * [从零开始学习 SLAM](#从零开始学习-slam)
+      * [为什么要学 SLAM](#为什么要学-slam)
+      * [学习 SLAM 到底需要学什么](#学习-slam-到底需要学什么)
+      * [SLAM 有什么用](#slam-有什么用)
+      * [C  11 新特性](#c11-新特性)
+      * [为什么要用齐次坐标](#为什么要用齐次坐标)
+      * [三维空间刚体的旋转](#三维空间刚体的旋转)
+      * [为啥需要李群与李代数](#为啥需要李群与李代数)
+         * [为啥需要李代数](#为啥需要李代数)
+         * [李群怎么理解](#李群怎么理解)
+         * [李代数和李群有什么关系](#李代数和李群有什么关系)
+      * [反对称矩阵](#反对称矩阵)
+      * [指数映射](#指数映射)
+      * [李群李代数之间的指数对数映射关系](#李群李代数之间的指数对数映射关系)
+      * [李代数求导](#李代数求导)
+      * [相机成像模型](#相机成像模型)
+         * [小孔成像](#小孔成像)
+         * [坐标系](#坐标系)
+         * [针孔相机成像原理](#针孔相机成像原理)
+         * [相机畸变](#相机畸变)
+      * [对极约束](#对极约束)
+         * [对极几何基本概念](#对极几何基本概念)
+         * [理解对极约束](#理解对极约束)
+         * [极线方程](#极线方程)
+      * [单应矩阵](#单应矩阵)
+      * [点云](#点云)
+         * [点云的优缺点](#点云的优缺点)
+         * [PCL](#pcl)
+         * [点云滤波](#点云滤波)
+            * [点云下采样](#点云下采样)
+            * [去除点云的离群点](#去除点云的离群点)
+         * [点云平滑法线估计](#点云平滑法线估计)
+            * [点云滤波后还需要平滑](#点云滤波后还需要平滑)
+            * [通过重采样实现点云平滑](#通过重采样实现点云平滑)
+            * [估计点云的表面法线](#估计点云的表面法线)
+   * [References](#references)
+      * [计算机视觉汇总分类](#计算机视觉汇总分类)
+      * [从零开始，系统化学习三维视觉核心技术路线](#从零开始系统化学习三维视觉核心技术路线)
+      * [SLAM 论文阅读和分类整理](#slam-论文阅读和分类整理)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc) [online](https://sleepeatcode.com/ghtoc)
 
 # 从零开始学习 SLAM
 
@@ -128,15 +171,15 @@ SLAM 是指当某种移动设备（如机器人、无人机、手机等）从一
 
 - [SO(3) 左扰动模型，SO(3) 李代数求导，SE(3) 左扰动模型讲解视频](https://v.qq.com/x/page/p0758q8ohvo.html)
 
-# [相机成像模型](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486116&idx=1&sn=38252b8f03ef16122e3ac494d7ec8740&chksm=97d7ef33a0a06625b34d491fc83c5e6e820baa11c6f9f0c113e32fdb7c7bf1e04e40fd8019ab&scene=21#wechat_redirect)
+## [相机成像模型](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486116&idx=1&sn=38252b8f03ef16122e3ac494d7ec8740&chksm=97d7ef33a0a06625b34d491fc83c5e6e820baa11c6f9f0c113e32fdb7c7bf1e04e40fd8019ab&scene=21#wechat_redirect)
 
-## 小孔成像
+### 小孔成像
 
 把倒立的实像去掉，用正立的虚像代替。三维空间的点大 P 在成像平面上成的像就是小 p。大 P，小 p 还有相机中心 C 在同一条直线上。
 
 ![](./img/camera.jpg)
 
-## 坐标系
+### 坐标系
 
 - 世界坐标系(world coordinate system)：是用户定义的三维世界的坐标系，以某个点为原点，为了描述目标物在真实世界里的位置而被引入。单位为m。
 - 相机坐标系(camera coordinate system)：是以相机为原点建立的坐标系，为了从相机的角度描述物体位置而定义，作为沟通世界坐标系和图像/像素坐标系的中间一环。单位为m。
@@ -145,7 +188,7 @@ SLAM 是指当某种移动设备（如机器人、无人机、手机等）从一
 
 - 图像坐标系(image coordinate system)：是为了描述成像过程中物体从相机坐标系到图像坐标系的投影透射关系而引入，是我们真正从相机内读取到的图像所在的坐标系。单位为像素。
 
-## 针孔相机成像原理
+### 针孔相机成像原理
 
 ![](./img/camera-1.jpg)
 
@@ -155,7 +198,7 @@ SLAM 是指当某种移动设备（如机器人、无人机、手机等）从一
 
 其中 fx, fy 分别是 x, y 方向焦距，一般都是相等的，cx, cy 是光心位置，一般是长和宽的一半，都是内参，此外还有畸变系数也属于内参，他们都是相机固有参数。
 
-## 相机畸变
+### 相机畸变
 
 畸变产生的原因是：透镜不能完全满足针孔模型假设。
 
@@ -165,27 +208,27 @@ SLAM 是指当某种移动设备（如机器人、无人机、手机等）从一
 
 切向畸变是由于透镜和 CMOS 或者 CCD 的安装位置误差导致。如果存在切向畸变，一个矩形被投影到成像平面上时，很可能会变成一个梯形。不过随着相机制造工艺的大大提升，这种情况很少出现了，所以一般也不考虑切向的畸变。
 
-# [对极约束](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486151&idx=1&sn=2b322f466d916704b1070ece20e669db&chksm=97d7ef50a0a06646a984fcbf82870011ec10a9233899ee74fe8c09432517c5efaa285f1897c9&scene=21#wechat_redirect)
+## [对极约束](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486151&idx=1&sn=2b322f466d916704b1070ece20e669db&chksm=97d7ef50a0a06646a984fcbf82870011ec10a9233899ee74fe8c09432517c5efaa285f1897c9&scene=21#wechat_redirect)
 
-## 对极几何基本概念
+### 对极几何基本概念
 
 ![](./img/epipolar.png)
 
 C0-C1-P 组成的平面称为极平面（epipolar plane），和成像平面相交的直线称之为极线（epipolar line），两个光心 C0, C1 和成像平面的交点叫做极点（epipole）。
 
-## 理解对极约束
+### 理解对极约束
 
 ![](./img/epipolar-1.png)
 
 ![](./img/epipolar-2.png)
 
-## 极线方程
+### 极线方程
 
 ![](./img/epipolar-3.png)
 
 ![](./img/epipolar-4.png)
 
-# [单应矩阵](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486191&idx=1&sn=3b33d748dd4cd035e429665ef1e40299&chksm=97d7ef78a0a0666ebdd86886241b19c0a77a0ec8fa5e1a1ff5de2ae3e89740ffc5516f942bab&scene=21#wechat_redirect)
+## [单应矩阵](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486191&idx=1&sn=3b33d748dd4cd035e429665ef1e40299&chksm=97d7ef78a0a0666ebdd86886241b19c0a77a0ec8fa5e1a1ff5de2ae3e89740ffc5516f942bab&scene=21#wechat_redirect)
 
 ![](./img/homography-0.jpg)
 
@@ -197,19 +240,19 @@ C0-C1-P 组成的平面称为极平面（epipolar plane），和成像平面相�
 
 ![](./img/homography-4.jpg)
 
-# [点云](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486281&idx=1&sn=1b36bcfd9f492dabc44ae2f10562e040&chksm=97d7eedea0a067c89eb9b1e71f7cf5dd12410c8c81d43dc2a21f9c6f28babd7add017ad14705&scene=21#wechat_redirect)
+## [点云](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486281&idx=1&sn=1b36bcfd9f492dabc44ae2f10562e040&chksm=97d7eedea0a067c89eb9b1e71f7cf5dd12410c8c81d43dc2a21f9c6f28babd7add017ad14705&scene=21#wechat_redirect)
 
-## 点云的优缺点
+### 点云的优缺点
 
 第一个优点就是可以表达物体的空间轮廓和具体位置。第二个优点就是，点云本身和视角无关，也就是你可以任意旋转，可以从不同角度和方向观察一个点云，而且不同的点云只要在同一个坐标系下就可以直接融合。
 
 第一个缺点就是点云并不是稠密的表达，一般比较稀疏，在空间很多位置其实没有点云，这部分的信息是缺失的。第二个缺点就是点云的分辨率和离相机的距离有关。离近了看是看不清是什么的，只能拉的很远才能看个大概。
 
-## [PCL](http://docs.pointclouds.org/trunk/index.html)
+### [PCL](http://docs.pointclouds.org/trunk/index.html)
 
 ![](./img/point-cloud.jpg)
 
-## [点云滤波](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486610&idx=1&sn=145132b3de5600d3a288c00bd50a7fa7&chksm=97d7e905a0a0601389157ca27a1be2618243f822583c5660ea18ff51f88f317fe8ac84360856&scene=21#wechat_redirect)
+### [点云滤波](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486610&idx=1&sn=145132b3de5600d3a288c00bd50a7fa7&chksm=97d7e905a0a0601389157ca27a1be2618243f822583c5660ea18ff51f88f317fe8ac84360856&scene=21#wechat_redirect)
 
 滤波原因：
 
@@ -224,7 +267,7 @@ C0-C1-P 组成的平面称为极平面（epipolar plane），和成像平面相�
 2. 通过常用滤波算法修改点的部分属性
 3. 对数据进行下采样
 
-### 点云下采样
+#### 点云下采样
 
 ```c
 pcl::ApproximateVoxelGrid< PointT >
@@ -232,7 +275,7 @@ pcl::ApproximateVoxelGrid< PointT >
 
 对输入的点云数据创建一个三维体素栅格，每个体素内用体素中所有点的重心来近似显示体素中其他点，这样该体素内所有点都用一个重心点最终表示。它的优点是可以在下采样的时候保存点云的形状特征。
 
-### 去除点云的离群点
+#### 去除点云的离群点
 
 离群点会使局部点云特征(如表面法线或曲率变化)的估计复杂化，从而导致错误的值，从而可能导致点云配准失败。而且这些离群点还会随着积累进行传导。
 
@@ -248,13 +291,13 @@ pcl::RadiusOutlierRemoval< pcl::PointXYZ >
 
 根据空间点半径范围临近点数量来滤波。在点云数据中，设定每个点一定半径范围内周围至少有足够多的近邻，不满足就会被删除。
 
-## [点云平滑法线估计](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486705&idx=1&sn=ca333d7bb12b7c226270e98d0003a789&chksm=97d7e966a0a06070a8dba605966016d227d7a6cad786498070d9e1b8cea8747470a4840257fd&scene=21#wechat_redirect)
+### [点云平滑法线估计](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247486705&idx=1&sn=ca333d7bb12b7c226270e98d0003a789&chksm=97d7e966a0a06070a8dba605966016d227d7a6cad786498070d9e1b8cea8747470a4840257fd&scene=21#wechat_redirect)
 
-### 点云滤波后还需要平滑
+#### 点云滤波后还需要平滑
 
 用 RGB-D，激光扫描仪等设备扫描物体，尤其是比较小的物体时，往往会有测量误差。这些误差所造成的不规则数据如果直接拿来曲面重建的话，会使得重建的曲面不光滑或者有漏洞，而且这种不规则数据很难用前面提到过的统计分析等滤波方法消除，所以为了建立光滑完整的模型必须对物体表面进行平滑处理和漏洞修复。
 
-### 通过重采样实现点云平滑
+#### 通过重采样实现点云平滑
 
 点云重采样，实际上是通过“移动最小二乘”（MLS， Moving Least Squares ）法来实现的。
 
@@ -262,7 +305,7 @@ pcl::RadiusOutlierRemoval< pcl::PointXYZ >
 pcl::MovingLeastSquares< PointT, PointT >
 ```
 
-### 估计点云的表面法线
+#### 估计点云的表面法线
 
 法线的用处：尤其是在三维建模中应用非常广泛，比如在计算机图形学（computer graphics）领域里，法线决定着曲面与光源（light source）的强弱处理（Flat Shading），对于每个点光源位置，其亮度取决于曲面法线的方向。
 
