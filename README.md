@@ -515,3 +515,5 @@ ICP 算法流程：
 ## [从零开始，系统化学习三维视觉核心技术路线](https://mp.weixin.qq.com/s/eWroro-4TJqw3zJdtCLwfA)
 
 ## [SLAM 论文阅读和分类整理](https://blog.csdn.net/heyijia0327/article/details/82855443)
+
+## [GitHub: SLAMBOOK2](https://github.com/gaoxiang12/slambook2)
