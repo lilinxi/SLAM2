@@ -3,7 +3,7 @@ project(PlotTrajectory)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(Eigen3 REQUIRED)
-include_directories(${Eigen3_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIRS})
 
 find_package(Pangolin REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
