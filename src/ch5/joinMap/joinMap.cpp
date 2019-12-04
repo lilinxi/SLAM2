@@ -4,9 +4,9 @@
 #include <boost/format.hpp>  // for formating strings
 #include <sophus/se3.hpp>
 #include <pangolin/pangolin.h>
-//#include <pcl/point_types.h>
-//#include <pcl/io/pcd_io.h>
-//#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
 
 using namespace std;
 typedef vector<Sophus::SE3d, Eigen::aligned_allocator<Sophus::SE3d>> TrajectoryType;
@@ -50,10 +50,10 @@ int main(int argc, char **argv) {
     pointcloud.reserve(1000000);
 
     // 定义点云使用的格式：这里用的是XYZRGB
-//    typedef pcl::PointXYZRGB PointT;
-//    typedef pcl::PointCloud<PointT> PointCloud;
+    typedef pcl::PointXYZRGB PointT;
+    typedef pcl::PointCloud <PointT> PointCloud;
     // 新建一个点云
-//    PointCloud::Ptr pointCloud(new PointCloud);
+    PointCloud::Ptr pointCloud(new PointCloud);
 
     for (int i = 0; i < 5; i++) {
         cout << "转换图像中: " << i + 1 << endl;
@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
         cv::Mat depth = depthImgs[i];
         Sophus::SE3d T = poses[i];
         // 如果你的机器慢，请把后面的v++和u++改成v+=2, u+=2
-        for (int v = 0; v < color.rows; v+=2)
-            for (int u = 0; u < color.cols; u+=2) {
+        for (int v = 0; v < color.rows; v += 2)
+            for (int u = 0; u < color.cols; u += 2) {
                 unsigned int d = depth.ptr<unsigned short>(v)[u]; // 深度值
                 if (d == 0) continue; // 为0表示没有测量到
                 Eigen::Vector3d point;
@@ -80,35 +80,35 @@ int main(int argc, char **argv) {
 //                cout << color.step << ", " << color.channels() << endl; // 1920, 3
 //                cout << color.rows << ", " << color.cols << endl; // 480, 640
 
-//                PointT p2;
-//                p2.x = pointWorld[0];
-//                p2.y = pointWorld[1];
-//                p2.z = pointWorld[2];
-//                p2.b = color.data[v * color.step + u * color.channels()];
-//                p2.g = color.data[v * color.step + u * color.channels() + 1];
-//                p2.r = color.data[v * color.step + u * color.channels() + 2];
-//                pointCloud->points.push_back(p2);
+                PointT p2;
+                p2.x = pointWorld[0];
+                p2.y = pointWorld[1];
+                p2.z = pointWorld[2];
+                p2.b = color.data[v * color.step + u * color.channels()];
+                p2.g = color.data[v * color.step + u * color.channels() + 1];
+                p2.r = color.data[v * color.step + u * color.channels() + 2];
+                pointCloud->points.push_back(p2);
             }
     }
 
     cout << "点云共有" << pointcloud.size() << "个点." << endl;
-    showPointCloud(pointcloud);
+//    showPointCloud(pointcloud);
 
-//    pointCloud->is_dense = false;
-//    cout << "点云共有" << pointCloud->size() << "个点." << endl;
-//    pcl::io::savePCDFileBinary("map.pcd", *pointCloud);
+    pointCloud->is_dense = false;
+    cout << "点云共有" << pointCloud->size() << "个点." << endl;
+    pcl::io::savePCDFileBinary("map.pcd", *pointCloud);
 
     // 方便起见这里使用指针的形式
-//    PointCloud::Ptr cloud(new PointCloud);
-//    if (pcl::io::loadPCDFile("map.pcd", *cloud) == -1) {
-//        PCL_ERROR("can not read file");
-//        return 0;
-//    }
+    PointCloud::Ptr cloud(new PointCloud);
+    if (pcl::io::loadPCDFile("map.pcd", *cloud) == -1) {
+        PCL_ERROR("can not read file");
+        return 0;
+    }
 
     // 展示 map.pcd 中的内容
-//    pcl::visualization::PCLVisualizer viewer;
-//    viewer.addPointCloud(cloud, "cloud");
-//    viewer.spin();
+    pcl::visualization::PCLVisualizer viewer;
+    viewer.addPointCloud(cloud, "cloud");
+    viewer.spin();
 
     return 0;
 }

@@ -15,16 +15,10 @@ include_directories(${Sophus_INCLUDE_DIRS})
 
 find_package(Pangolin REQUIRED)
 
-#find_package(PCL REQUIRED COMPONENT common io)
-#find_package(PCL REQUIRED COMPONENT common io visualization)
-#include_directories(${PCL_INCLUDE_DIRS})
-#add_definitions(${PCL_DEFINITIONS})
-#message(STATUS "    include path: ${PCL_INCLUDE_DIRS}")
-#message(STATUS "    definitions: ${PCL_DEFINITIONS}")
-#message(STATUS "    libraries: ${PCL_LIBRARIES}")
-# 必须手动添加 visualization 库
-#link_libraries(/usr/local/Cellar/pcl/1.9.1_4/lib/libpcl_visualization.dylib)
+FIND_PACKAGE(PCL 1.7 REQUIRED)
+ADD_DEFINITIONS(${PCL_DEFINITIONS})
+INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
+LINK_LIBRARIES(${PCL_LIBRARY_DIRS})
 
 add_executable(joinMap joinMap.cpp)
-target_link_libraries(joinMap ${OpenCV_LIBS} ${Pangolin_LIBRARIES})
-#target_link_libraries(joinMap ${OpenCV_LIBS} ${Pangolin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(joinMap ${OpenCV_LIBS} ${Pangolin_LIBRARIES} ${PCL_LIBRARIES})
