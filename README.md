@@ -66,6 +66,10 @@ Table of Contents
          * [Sophus](https://github.com/strasdat/Sophus)
          * [Pangolin](https://github.com/stevenlovegrove/Pangolin)
          * [PCL](https://github.com/PointCloudLibrary/pcl)
+      * [Books](#Books)
+         * [《视觉 SLAM 十四讲》](https://www.cnblogs.com/gaoxiang12/)
+         * [《计算机视觉中的多视图几何》](#《计算机视觉中的多视图几何》)
+         * [《概率机器人学》](https://docs.ufpr.br/~danielsantos/ProbabilisticRobotics.pdf)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc) [online](https://sleepeatcode.com/ghtoc)
 
@@ -532,3 +536,11 @@ ICP 算法流程：
 ### [Pangolin](https://github.com/stevenlovegrove/Pangolin)
 
 ### [PCL](https://github.com/PointCloudLibrary/pcl)
+
+## Books
+
+### [《视觉 SLAM 十四讲》](https://www.cnblogs.com/gaoxiang12/)
+
+### 《计算机视觉中的多视图几何》
+
+### [《概率机器人学》](https://docs.ufpr.br/~danielsantos/ProbabilisticRobotics.pdf)
