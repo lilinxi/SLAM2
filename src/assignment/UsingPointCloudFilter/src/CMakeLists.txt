@@ -1,0 +1,24 @@
+
+FIND_PACKAGE(PCL 1.7 REQUIRED)
+
+FIND_PACKAGE(OpenCV REQUIRED)
+
+ADD_DEFINITIONS(${PCL_DEFINITIONS})
+INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
+LINK_LIBRARIES(${PCL_LIBRARY_DIRS})
+
+#find_package(Boost REQUIRED)
+#include_directories(${Boost_INCLUDE_DIR})
+#link_libraries(${BOOST_LIBRARIES})
+#MESSAGE(STATUS ":" ${BOOST_LIBRARIES})
+
+ADD_EXECUTABLE(pointCloudFilter pointCloudFilter.cpp)
+TARGET_LINK_LIBRARIES(pointCloudFilter
+        ${OpenCV_LIBS}
+        ${PCL_LIBRARIES}
+#        ${BOOST_LIBRARIES}
+        )
+
+
+
+
