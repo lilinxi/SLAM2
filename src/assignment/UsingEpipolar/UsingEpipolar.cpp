@@ -13,6 +13,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/imgproc.hpp>
 
 using namespace std;
 using namespace cv;
@@ -65,6 +66,25 @@ int main(int argc, char **argv) {
 
     // 请先计算基础矩阵并据此绘制出前10个匹配点对应的对极线，可以调用opencv函数
     // ----------- 开始你的代码 --------------//
+
+    Mat F;
+    F = findFundamentalMat(pts1, pts2, FM_RANSAC);
+    cout << "基础矩阵F:" << endl << F << endl;
+
+    vector<Vec3f> linesl;
+    computeCorrespondEpilines(pts1, 1, F, linesl);
+
+    for (auto it = linesl.begin(); it != linesl.end(); it++) {
+        line(rgb1, Point(0, -(*it)[2] / (*it)[1]), Point(rgb1.cols, -((*it)[2] + (*it)[0] * rgb1.cols) / (*it)[1]),
+             Scalar(255, 255, 255));
+    }
+
+    vector<Vec3f> lines2;
+    computeCorrespondEpilines(pts2, 2, F, lines2);
+    for (auto it = lines2.begin(); it != lines2.end(); it++) {
+        line(rgb2, Point(0, -(*it)[2] / (*it)[1]), Point(rgb2.cols, -((*it)[2] + (*it)[0] * rgb2.cols) / (*it)[1]),
+             Scalar(255, 255, 255));
+    }
 
     // ----------- 结束你的代码 --------------//
 

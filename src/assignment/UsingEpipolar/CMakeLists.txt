@@ -10,8 +10,8 @@ message(STATUS "    version: ${OpenCV_VERSION}")
 message(STATUS "    libraries: ${OpenCV_LIBS}")
 message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 
-add_executable(main UsingEpipolar.cpp)
-target_link_libraries(main LINK_PRIVATE ${OpenCV_LIBS})
+add_executable(UsingEpipolar UsingEpipolar.cpp)
+target_link_libraries(UsingEpipolar LINK_PRIVATE ${OpenCV_LIBS})
 
 
 
