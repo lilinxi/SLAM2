@@ -61,6 +61,11 @@ Table of Contents
       * [计算机视觉汇总分类](#计算机视觉汇总分类)
       * [从零开始，系统化学习三维视觉核心技术路线](#从零开始系统化学习三维视觉核心技术路线)
       * [SLAM 论文阅读和分类整理](#slam-论文阅读和分类整理)
+      * [Libs](#Libs)
+         * [Eigen3](https://github.com/eigenteam/eigen-git-mirror)
+         * [Sophus](https://github.com/strasdat/Sophus)
+         * [Pangolin](https://github.com/stevenlovegrove/Pangolin)
+         * [PCL](https://github.com/PointCloudLibrary/pcl)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc) [online](https://sleepeatcode.com/ghtoc)
 
@@ -517,3 +522,13 @@ ICP 算法流程：
 ## [SLAM 论文阅读和分类整理](https://blog.csdn.net/heyijia0327/article/details/82855443)
 
 ## [GitHub: SLAMBOOK2](https://github.com/gaoxiang12/slambook2)
+
+## Libs
+
+### [Eigen3](https://github.com/eigenteam/eigen-git-mirror)
+
+### [Sophus](https://github.com/strasdat/Sophus)
+
+### [Pangolin](https://github.com/stevenlovegrove/Pangolin)
+
+### [PCL](https://github.com/PointCloudLibrary/pcl)
