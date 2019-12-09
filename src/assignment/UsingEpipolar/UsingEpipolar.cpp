@@ -22,10 +22,12 @@ int main(int argc, char **argv) {
     Mat rgb1 = imread("./rgb1.ppm");
     Mat rgb2 = imread("./rgb2.ppm");
 
-    Ptr<FeatureDetector> detector;
+//    Ptr<FeatureDetector> detector;
+    Ptr<ORB> detector = ORB::create();
     Ptr<DescriptorExtractor> descriptor;
 
-    detector = cv::DescriptorMatcher::create("ORB");
+    // TODO bug : https://www.cnblogs.com/wangguchangqing/p/8076061.html
+//    detector = cv::DescriptorMatcher::create("ORB");
     descriptor = cv::DescriptorMatcher::create("ORB");
 
     vector<KeyPoint> kp1, kp2;
@@ -34,8 +36,10 @@ int main(int argc, char **argv) {
 
     // 计算描述子
     Mat desp1, desp2;
-    descriptor->compute(rgb1, kp1, desp1);
-    descriptor->compute(rgb2, kp2, desp2);
+//    descriptor->compute(rgb1, kp1, desp1);
+//    descriptor->compute(rgb2, kp2, desp2);
+    detector->compute(rgb1, kp1, desp1);
+    detector->compute(rgb2, kp2, desp2);
 
     // 匹配描述子
     vector<DMatch> matches;
