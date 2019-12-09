@@ -57,6 +57,11 @@ Table of Contents
          * [视觉里程计：特征点法之全面梳理](#视觉里程计特征点法之全面梳理)
             * [如何获得好的 VO 效果](#如何获得好的-vo-效果)
             * [特征点法 VO 算法](#特征点法-vo-算法)
+      * [张氏相机标定法](#张氏相机标定法)
+         * [成像几何模型](#成像几何模型)
+         * [单应矩阵](#单应矩阵-1)
+         * [推导求解](#推导求解)
+         * [优化算法](#优化算法)
    * [References](#references)
       * [计算机视觉汇总分类](#计算机视觉汇总分类)
       * [从零开始，系统化学习三维视觉核心技术路线](#从零开始系统化学习三维视觉核心技术路线)
@@ -514,6 +519,85 @@ ICP 算法流程：
     - 最常用的离群点去除方法就是随机采样一致算法（Random Sample Consensus，RANSAC）
 5. Bundle Adjustment 优化
     - BA 的本质是一个优化模型，其目的是最小化重投影误差。
+
+## 张氏相机标定法
+
+### [成像几何模型](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247484873&idx=1&sn=e2affdaaf226d83bda7532963e917f62&chksm=97d7e05ea0a06948c4d31348913ffe2a70ab67b333f6445000a3b0541a0093849b600438a2d5&scene=21#wechat_redirect)
+
+相机标定的目的是：**建立相机成像几何模型并矫正透镜畸变**。
+
+- 世界坐标系(world coordinate system)：用户定义的三维世界的坐标系，为了描述目标物在真实世界里的位置而被引入。单位为m。
+- 相机坐标系(camera coordinate system)：在相机上建立的坐标系，为了从相机的角度描述物体位置而定义，作为沟通世界坐标系和图像/像素坐标系的中间一环。单位为m。
+- 图像坐标系(image coordinate
+ system)：为了描述成像过程中物体从相机坐标系到图像坐标系的投影透射关系而引入，方便进一步得到像素坐标系下的坐标。 单位为m。
+- 像素坐标系(pixel coordinate system)：为了描述物体成像后的像点在数字图像上（相片）的坐标而引入，是我们真正从相机内读取到的信息所在的坐标系。单位为个（像素数目）。
+
+下图可以更清晰地表达这四个坐标系之间的关系：
+
+![](./img/calibration-1.jpg)
+
+世界坐标系：Xw、Yw、Zw。相机坐标系： Xc、Yc、Zc。图像坐标系：x、y。像素坐标系：u、v。
+
+1. 从世界坐标系到相机坐标系
+
+![](./img/calibration-2.jpg)
+
+2. 从相机坐标系到理想图像坐标系（不考虑畸变）
+
+![](./img/calibration-3.jpg)
+
+![](./img/calibration-4.jpg)
+
+![](./img/calibration-5.jpg)
+
+3. 从理想图像坐标系到实际图像坐标系（考虑畸变）
+
+![](./img/calibration-6.jpg)
+
+![](./img/calibration-7.jpg)
+
+4. 从实际图像坐标系到像素坐标系
+
+![](./img/calibration-8.jpg)
+
+![](./img/calibration-9.jpg)
+
+总结从世界坐标系到像素坐标系（不考虑畸变）的转换关系：
+
+![](./img/calibration-10.jpg)
+
+### [单应矩阵](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247484931&idx=1&sn=c3b8ca92772b196fd4107328df0522cb&chksm=97d7e394a0a06a825682a492218a276d7d9e0f9737920f2c1789cd271c85fae638aa069e9662&scene=21#wechat_redirect)
+
+**单应性**（Homography）变换。可以简单的理解为它用来**描述物体在世界坐标系和像素坐标系之间的位置映射关系**。对应的变换矩阵称为单应性矩阵。
+
+单应性在计算机视觉中的应用：
+
+1. 图像校正
+2. 视角变换
+3. 图像拼接
+4. 增强显示（AR)
+
+**单应矩阵有8个自由度，至少需要4个点对来确定**。在真实的应用场景中，我们计算的点对中都会包含噪声，为了使得计算更精确，一般都会使用远大于4
+个点对来计算单应矩阵。另外采用直接线性解法通常很难得到最优解，所以实际使用中一般会用其他优化方法，如奇异值分解、Levenberg-Marquarat（LM）算法等进行求解。
+
+> OpenCV 中有现成的函数可以调用，用来计算单应矩阵：Mat findHomography(InputArray srcPoints, InputArray dstPoints, int method=0, double ransacReprojThreshold=3, OutputArray mask=noArray() )
+
+### [推导求解](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247484969&idx=1&sn=abda897d596adedfe13c3495b0b02d50&chksm=97d7e3bea0a06aa8e3fcb2b68c8863488e66410166d7bf159d6d3ff2c103f515345ada4c1191&scene=21#wechat_redirect)
+
+![](./img/calibration-11.jpg)
+
+H是内参矩阵和外参矩阵的混合体，其中，u、v表示像素坐标系中的坐标，s表示尺度因子，fx、fy、u0、v0、γ（由于制造误差产生的两个坐标轴偏斜参数，通常很小）表示5个相机内参，R,t表示相机外参。
+
+求解内参和外参的求解思路是利用旋转向量的约束关系，求解过程略。
+
+因为旋转向量在构造中是相互正交的，即r1和r2相互正交，由此我们就可以利用“正交”的两个含义，得出每个单应矩阵提供的两个约束条件：
+
+- 约束条件1：旋转向量点积为0（两垂直平面上的旋转向量互相垂直）；
+- 约束条件2：旋转向量长度相等（旋转不改变尺度）。
+
+### 优化算法
+
+[梯度下降](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247485041&idx=1&sn=9268b9a0aa90b4f64f216e08ef64f63d&chksm=97d7e3e6a0a06af0f33720bc8d9ca4e4a07ca0a8e7c8a6b0b4d7261e03fb5e1ee564ae367b44&scene=21#wechat_redirect)、[牛顿法、高斯牛顿法、LM法](https://mp.weixin.qq.com/s?__biz=MzIxOTczOTM4NA==&mid=2247485075&idx=1&sn=f664e241d0b6b7e59b0f3e6195fef2c7&chksm=97d7e304a0a06a12ef02f49f05945b78fea81723e92077bb7adac9e6b5bae2b36763570ab190&scene=21#wechat_redirect)
 
 ---
 
