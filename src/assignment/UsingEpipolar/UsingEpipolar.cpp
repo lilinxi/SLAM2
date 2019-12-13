@@ -19,16 +19,14 @@ using namespace std;
 using namespace cv;
 
 int main(int argc, char **argv) {
-    Mat rgb1 = imread("./rgb1.ppm");
-    Mat rgb2 = imread("./rgb2.ppm");
+    Mat rgb1 = imread("../rgb1.ppm");
+    Mat rgb2 = imread("../rgb2.ppm");
 
-//    Ptr<FeatureDetector> detector;
-    Ptr<ORB> detector = ORB::create();
-    Ptr<DescriptorExtractor> descriptor;
-
-    // TODO bug : https://www.cnblogs.com/wangguchangqing/p/8076061.html
-//    detector = cv::DescriptorMatcher::create("ORB");
-    descriptor = cv::DescriptorMatcher::create("ORB");
+    Ptr<FeatureDetector> detector = ORB::create();
+    Ptr<DescriptorExtractor> descriptor = ORB::create();
+//    Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("ORB");
+//    Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("BruteForce-Hamming");
+    Ptr<BFMatcher> matcher = BFMatcher::create();
 
     vector<KeyPoint> kp1, kp2;
     detector->detect(rgb1, kp1);
@@ -36,15 +34,12 @@ int main(int argc, char **argv) {
 
     // 计算描述子
     Mat desp1, desp2;
-//    descriptor->compute(rgb1, kp1, desp1);
-//    descriptor->compute(rgb2, kp2, desp2);
-    detector->compute(rgb1, kp1, desp1);
-    detector->compute(rgb2, kp2, desp2);
+    descriptor->compute(rgb1, kp1, desp1);
+    descriptor->compute(rgb2, kp2, desp2);
 
     // 匹配描述子
     vector<DMatch> matches;
-    BFMatcher matcher;
-    matcher.match(desp1, desp2, matches);
+    matcher->match(desp1, desp2, matches);
     cout << "Find total " << matches.size() << " matches." << endl;
 
     // 筛选匹配对
@@ -92,6 +87,8 @@ int main(int argc, char **argv) {
 
     // ----------- 结束你的代码 --------------//
 
+    drawKeypoints(rgb1, kp1, rgb1, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+    drawKeypoints(rgb2, kp2, rgb2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
     imshow("epiline1", rgb2);
     imshow("epiline2", rgb1);
     waitKey(0);
