@@ -653,6 +653,7 @@ H是内参矩阵和外参矩阵的混合体，其中，u、v表示像素坐标�
 ### [Kitti](https://blog.csdn.net/weixin_43599336/article/details/87801040)
 
 - https://uinedu-my.sharepoint.com/:f:/g/personal/19604_myoffice_site/EiLTzAbNirROrQQF20eupMQB-KpIfZOa7w2YS5MB2ARvSA
+- https://bt.byr.cn/details.php?id=266681&hit=1
 
 ## Books
 
