@@ -21,6 +21,8 @@ using namespace cv;
 int main(int argc, char **argv) {
     Mat rgb1 = imread("../rgb1.ppm");
     Mat rgb2 = imread("../rgb2.ppm");
+    rgb1 = imread("../1.png", IMREAD_COLOR);
+    rgb2 = imread("../2.png", IMREAD_COLOR);
 
     Ptr<FeatureDetector> detector = ORB::create();
     Ptr<DescriptorExtractor> descriptor = ORB::create();

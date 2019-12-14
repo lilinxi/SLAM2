@@ -20,5 +20,5 @@ include_directories(
         ${Sophus_INCLUDE_DIRS}
 )
 
-add_executable(2d2d pose_estimation_2d2d.cpp)
-target_link_libraries(2d2d ${OpenCV_LIBS})
+add_executable(triangulation triangulation.cpp)
+target_link_libraries(triangulation ${OpenCV_LIBS})
