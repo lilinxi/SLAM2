@@ -1,7 +1,3 @@
-//
-// Created by xiang on 18-11-25.
-//
-
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <nmmintrin.h>
