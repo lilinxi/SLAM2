@@ -78,6 +78,7 @@ Table of Contents
          * [MeshLab](http://www.meshlab.net/)
          * [DBow3](https://github.com/rmsalinas/DBow3)
          * [Kitti](https://blog.csdn.net/weixin_43599336/article/details/87801040)
+         * [OctoMap](https://github.com/OctoMap/octomap)
       * [Books](#Books)
          * [《视觉 SLAM 十四讲》](https://www.cnblogs.com/gaoxiang12/)
          * [《计算机视觉中的多视图几何》](#《计算机视觉中的多视图几何》)
@@ -654,6 +655,8 @@ H是内参矩阵和外参矩阵的混合体，其中，u、v表示像素坐标�
 
 - https://uinedu-my.sharepoint.com/:f:/g/personal/19604_myoffice_site/EiLTzAbNirROrQQF20eupMQB-KpIfZOa7w2YS5MB2ARvSA
 - https://bt.byr.cn/details.php?id=266681&hit=1
+
+### [OctoMap](https://github.com/OctoMap/octomap)
 
 ## Books
 
