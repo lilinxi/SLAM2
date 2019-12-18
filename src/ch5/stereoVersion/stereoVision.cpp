@@ -35,7 +35,6 @@ int main(int argc, char **argv) {
     cv::imshow("2", disparity);
     cout << disparity.type() << endl;
 
-
     // 生成点云
     vector<Vector4d, Eigen::aligned_allocator<Vector4d>> pointcloud;
 
@@ -50,9 +49,12 @@ int main(int argc, char **argv) {
             double x = (u - cx) / fx;
             double y = (v - cy) / fy;
             double depth = fx * b / (disparity.at<float>(v, u));
+            cout << depth << endl;
+//            cout << disparity.at<float>(v, u) << endl;
             point[0] = x * depth;
             point[1] = y * depth;
             point[2] = depth;
+            cout << point[0] << " , " << point[1] << " , " << point[2] << endl;
 
             pointcloud.push_back(point);
         }
