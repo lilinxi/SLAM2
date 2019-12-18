@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <pangolin/pangolin.h>
 #include <unistd.h>
+#include <iostream>
 
 using namespace std;
 using namespace Eigen;
@@ -28,14 +29,19 @@ int main(int argc, char **argv) {
             0, 96, 9, 8 * 9 * 9, 32 * 9 * 9, 1, 63, 10, 100, 32);    // 神奇的参数
     cv::Mat disparity_sgbm, disparity;
     sgbm->compute(left, right, disparity_sgbm);
+    cv::imshow("1", disparity_sgbm);
+    cout << disparity_sgbm.type() << endl;
     disparity_sgbm.convertTo(disparity, CV_32F, 1.0 / 16.0f);
+    cv::imshow("2", disparity);
+    cout << disparity.type() << endl;
+
 
     // 生成点云
     vector<Vector4d, Eigen::aligned_allocator<Vector4d>> pointcloud;
 
     // 如果你的机器慢，请把后面的v++和u++改成v+=2, u+=2
-    for (int v = 0; v < left.rows; v+=2)
-        for (int u = 0; u < left.cols; u+=2) {
+    for (int v = 0; v < left.rows; v += 2)
+        for (int u = 0; u < left.cols; u += 2) {
             if (disparity.at<float>(v, u) <= 0.0 || disparity.at<float>(v, u) >= 96.0) continue;
 
             Vector4d point(0, 0, 0, left.at<uchar>(v, u) / 255.0); // 前三维为xyz,第四维为颜色
