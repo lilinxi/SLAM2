@@ -1,5 +1,5 @@
 
-FIND_PACKAGE(PCL 1.7 REQUIRED)
+FIND_PACKAGE(PCL REQUIRED)
 
 FIND_PACKAGE(OpenCV REQUIRED)
 
@@ -11,6 +11,9 @@ ADD_EXECUTABLE(pointCloud2Mesh pointCloud2Mesh.cpp)
 TARGET_LINK_LIBRARIES(pointCloud2Mesh
         ${OpenCV_LIBS}
         ${PCL_LIBRARIES}
+        /usr/local/lib/libflann.dylib
+        /usr/local/Cellar/flann/1.9.1_8/lib/libflann.dylib
+        /usr/local/Cellar/flann/1.9.1_8/lib/libflann_cpp.dylib
         )
 
 
